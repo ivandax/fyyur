@@ -485,18 +485,51 @@ def create_artist_form():
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
 
+def createArtistsResponse(artist):
+    body = {}
+    body['name'] = artist.name
+    body['city'] = artist.city
+    body['state'] = artist.state
+    body['phone'] = artist.phone
+    body['genres'] = artist.genres
+    body['image_link'] = artist.image_link
+    body['facebook_link'] = artist.facebook_link
+    body['website_link'] = artist.website_link
+    body['seeking_venue'] = artist.seeking_venue
+    body['seeking_description'] = artist.seeking_description
+    return body
+
 
 @ app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-    # called upon submitting the new artist listing form
-    # TODO: insert form data as a new Venue record in the db, instead
-    # TODO: modify data to be the data object returned from db insertion
-
-    # on successful db insert, flash success
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-    return render_template('pages/home.html')
+  try:
+    form = request.form
+    name = form['name']
+    city = form['city']
+    state = form['state']
+    phone = form['phone']
+    image_link = form['image_link']
+    facebook_link = form['facebook_link']
+    website_link = form['website_link']
+    seeking_venue = True if form.get(
+        'seeking_venue', False) == 'y' else False
+    seeking_description = form['seeking_description']
+    genres = form['genres']
+    artist = Artist(name=name, state=state, city=city, phone=phone, image_link=image_link, facebook_link=facebook_link,
+                  website_link=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description, genres=[genres])
+    db.session.add(artist)
+    db.session.commit()
+    flash('Artist ' + request.form['name'] + ' was successfully added!')
+    data = createArtistsResponse(artist)
+    print(data)
+  except:
+    print("we enter here")
+    db.session.rollback()
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    print(sys.exc_info)
+  finally:
+    db.session.close()
+  return render_template('pages/home.html')
 
 
 #  Shows
