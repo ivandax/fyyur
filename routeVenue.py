@@ -72,27 +72,51 @@ def create_venue_submission():
 
 @venueRoute.route('/venues')
 def venues():
-    data = [{
-        "city": "San Francisco",
-        "state": "CA",
-        "venues": [{
-            "id": 1,
-            "name": "The Musical Hop",
-            "num_upcoming_shows": 0,
-        }, {
-            "id": 3,
-            "name": "Park Square Live Music & Coffee",
-            "num_upcoming_shows": 1,
-        }]
-    }, {
-        "city": "New York",
-        "state": "NY",
-        "venues": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
-    }]
+    try:
+        venuesMap = {}
+        venues = Venue.query.all()
+        for venue in venues:
+            key = venue.city+venue.state
+            newVenue = {"id": venue.id, "name": venue.name}
+            # print(venue.shows)
+            if key in venuesMap:
+                currentVenues = venuesMap[key]["venues"]
+                currentVenues.append(newVenue)
+                print(currentVenues)
+                venuesMap[key]["venues"] = currentVenues
+            else:
+                venuesMap[key] = {
+                    "city": venue.city,
+                    "state": venue.state,
+                    "venues": [newVenue]
+                    }
+        data = list(venuesMap.values())
+        print(data)
+            
+    except:
+        print(sys.exc_info)
+    
+    # data = [{
+    #     "city": "San Francisco",
+    #     "state": "CA",
+    #     "venues": [{
+    #         "id": 1,
+    #         "name": "The Musical Hop",
+    #         "num_upcoming_shows": 0,
+    #     }, {
+    #         "id": 3,
+    #         "name": "Park Square Live Music & Coffee",
+    #         "num_upcoming_shows": 1,
+    #     }]
+    # }, {
+    #     "city": "New York",
+    #     "state": "NY",
+    #     "venues": [{
+    #         "id": 2,
+    #         "name": "The Dueling Pianos Bar",
+    #         "num_upcoming_shows": 0,
+    #     }]
+    # }]
 
     return render_template('pages/venues.html', areas=data)
 
