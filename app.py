@@ -124,14 +124,16 @@ def create_show_submission():
         start_time = form['start_time']
         artist = Artist.query.get(artist_id)
         venue = Venue.query.get(venue_id)
-        print("wip")
+        venue.artists = [artist]
+        db.session.add(venue)
+        db.session.commit()
         # flash('Show for ' + artist.name + ' and ' + venue.name + 'was successfully listed!')
-        # flash('Show was successfully listed!')
-        # print(data)
+        flash('Show was successfully listed!')
+        print(venue)
     except:
         db.session.rollback()
         flash('An error occurred. Show could not be listed.')
-        print(sys.exc_info)
+        print(sys.exc_info())
     finally:
         db.session.close()
     return render_template('pages/home.html')
