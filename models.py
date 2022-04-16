@@ -6,8 +6,9 @@ from app import db
 
 class Show(db.Model):
     __tablename__ = 'Show'
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), primary_key=True, nullable=False, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False, autoincrement=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     artist = db.relationship("Artist", back_populates="venues")
     venue = db.relationship("Venue", back_populates="artists")

@@ -2,6 +2,7 @@ from app import db
 
 from forms import *
 from flask import Blueprint, render_template, request, Response, flash, redirect, url_for
+from sqlalchemy.orm import lazyload
 
 from models import Venue
 import sys
@@ -74,9 +75,10 @@ def create_venue_submission():
 def venues():
     try:
         venuesMap = {}
-        venues = Venue.query.all()
+        venues = db.session.query(Venue).options(lazyload(Venue.artists)).all()
         for venue in venues:
             key = venue.city+venue.state
+            print(venue.artists)
             newVenue = {"id": venue.id, "name": venue.name}
             # print(venue.shows)
             if key in venuesMap:
