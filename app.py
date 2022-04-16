@@ -2,7 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-import sys
+
 import json
 import dateutil.parser
 import babel
@@ -17,6 +17,7 @@ from forms import *
 import collections
 import collections.abc
 collections.Callable = collections.abc.Callable
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -30,7 +31,8 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 from models import Venue, Artist
-
+from routeVenue import venueRoute
+app.register_blueprint(venueRoute)
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -63,8 +65,6 @@ def index():
 
 @ app.route('/venues')
 def venues():
-    # TODO: replace with real venues data.
-    #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
     data = [{
         "city": "San Francisco",
         "state": "CA",
@@ -86,6 +86,7 @@ def venues():
             "num_upcoming_shows": 0,
         }]
     }]
+
     return render_template('pages/venues.html', areas=data)
 
 
@@ -189,65 +190,6 @@ def show_venue(venue_id):
     data = list(filter(lambda d: d['id'] ==
                        venue_id, [data1, data2, data3]))[0]
     return render_template('pages/show_venue.html', venue=data)
-
-#  Create Venue
-#  ----------------------------------------------------------------
-
-
-@ app.route('/venues/create', methods=['GET'])
-def create_venue_form():
-    form = VenueForm()
-    return render_template('forms/new_venue.html', form=form)
-
-
-def createVenueResponse(venue):
-    body = {}
-    body['name'] = venue.name
-    body['city'] = venue.city
-    body['state'] = venue.state
-    body['address'] = venue.address
-    body['phone'] = venue.phone
-    body['image_link'] = venue.image_link
-    body['facebook_link'] = venue.facebook_link
-    body['website_link'] = venue.website_link
-    body['seeking_talent'] = venue.seeking_talent
-    body['seeking_description'] = venue.seeking_description
-    body['genres'] = venue.genres
-    return body
-
-
-@ app.route('/venues/create', methods=['POST'])
-def create_venue_submission():
-    try:
-        form = request.form
-        name = form['name']
-        city = form['city']
-        state = form['state']
-        address = form['address']
-        phone = form['phone']
-        image_link = form['image_link']
-        facebook_link = form['facebook_link']
-        website_link = form['website_link']
-        seeking_talent = True if form.get(
-            'seeking_talent', False) == 'y' else False
-        seeking_description = form['seeking_description']
-        genres = form['genres']
-        print(genres, type(genres), type(seeking_talent))
-        venue = Venue(name=name, state=state, city=city, address=address, phone=phone, image_link=image_link, facebook_link=facebook_link,
-                      website_link=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description, genres=[genres])
-        db.session.add(venue)
-        db.session.commit()
-        flash('Venue ' + request.form['name'] + ' was successfully listed!')
-        data = createVenueResponse(venue)
-        print(data)
-    except:
-        db.session.rollback()
-        flash('An error occurred. Venue ' +
-              request.form['name'] + ' could not be listed.')
-        print(sys.exc_info)
-    finally:
-        db.session.close()
-    return render_template('pages/home.html')
 
 
 @ app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -483,7 +425,6 @@ def create_artist_submission():
     print("we enter here")
     db.session.rollback()
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
-    print(sys.exc_info)
   finally:
     db.session.close()
   return render_template('pages/home.html')
