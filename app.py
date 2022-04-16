@@ -17,6 +17,7 @@ from forms import *
 import collections
 import collections.abc
 collections.Callable = collections.abc.Callable
+import sys
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -30,7 +31,7 @@ db = SQLAlchemy(app)
 # Add migration config
 migrate = Migrate(app, db)
 
-from models import Venue, Artist
+from models import Venue, Artist, shows
 from routeVenue import venueRoute
 from routeArtist import artistRoute
 app.register_blueprint(venueRoute)
@@ -116,14 +117,23 @@ def create_shows():
 
 @ app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-    # called to create new shows in the db, upon submitting new show listing form
-    # TODO: insert form data as a new Show record in the db, instead
-
-    # on successful db insert, flash success
-    flash('Show was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Show could not be listed.')
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    try:
+        form = request.form
+        artist_id = form['artist_id']
+        venue_id = form['venue_id']
+        start_time = form['start_time']
+        artist = Artist.query.get(artist_id)
+        venue = Venue.query.get(venue_id)
+        print("wip")
+        # flash('Show for ' + artist.name + ' and ' + venue.name + 'was successfully listed!')
+        # flash('Show was successfully listed!')
+        # print(data)
+    except:
+        db.session.rollback()
+        flash('An error occurred. Show could not be listed.')
+        print(sys.exc_info)
+    finally:
+        db.session.close()
     return render_template('pages/home.html')
 
 
