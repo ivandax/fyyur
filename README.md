@@ -188,3 +188,9 @@ From terminal:
 Initialize with `export FLASK_APP=app.py`
 Then `flask run` to start server
 
+I wanted to separate files into routes so I used Blueprints, but i had to change `main.html` like this:
+
+```
+<li {% if request.endpoint == 'venues' %} class="active" {% endif %}><a href="{{ url_for('venueRoute.venues') }}">Venues</a></li>
+```
+Notice the url_for points to a specific instance.
