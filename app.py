@@ -31,7 +31,7 @@ db = SQLAlchemy(app)
 # Add migration config
 migrate = Migrate(app, db)
 
-from models import Venue, Artist, shows
+from models import Venue, Artist, Show
 from routeVenue import venueRoute
 from routeArtist import artistRoute
 app.register_blueprint(venueRoute)
@@ -122,12 +122,13 @@ def create_show_submission():
         artist_id = form['artist_id']
         venue_id = form['venue_id']
         start_time = form['start_time']
-        artist = Artist.query.get(artist_id)
+
         venue = Venue.query.get(venue_id)
-        venue.artists = [artist]
-        db.session.add(venue)
+        artist = Artist.query.get(artist_id)
+        show = Show(venue_id=venue.id, artist_id=artist.id, start_time=start_time)
+    
+        db.session.add(show)
         db.session.commit()
-        # flash('Show for ' + artist.name + ' and ' + venue.name + 'was successfully listed!')
         flash('Show was successfully listed!')
         print(venue)
     except:

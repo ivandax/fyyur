@@ -4,10 +4,13 @@ from app import db
 # Models.
 #----------------------------------------------------------------------------#
 
-shows = db.Table('Show',
-  db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
-  db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-  db.Column('start_time', db.DateTime, nullable=False))
+class Show(db.Model):
+    __tablename__ = 'Show'
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), primary_key=True, nullable=False, autoincrement=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), primary_key=True, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    artist = db.relationship("Artist", back_populates="venues")
+    venue = db.relationship("Venue", back_populates="artists")
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -25,8 +28,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
     genres = db.Column(db.ARRAY(db.String))
-    artists = db.relationship(
-        "Artist", secondary=shows, backref=db.backref('venues', lazy=True))
+    artists = db.relationship("Show", back_populates="venue")
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -43,3 +45,4 @@ class Artist(db.Model):
     website_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
+    venues = db.relationship("Show", back_populates="artist")
