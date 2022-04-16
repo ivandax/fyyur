@@ -3,6 +3,7 @@ from app import db
 from forms import *
 from flask import Blueprint, render_template, request, Response, flash, redirect, url_for
 from sqlalchemy.orm import lazyload
+from datetime import datetime
 
 from models import Venue
 import sys
@@ -51,14 +52,12 @@ def create_venue_submission():
             'seeking_talent', False) == 'y' else False
         seeking_description = form['seeking_description']
         genres = form['genres']
-        print(genres, type(genres), type(seeking_talent))
         venue = Venue(name=name, state=state, city=city, address=address, phone=phone, image_link=image_link, facebook_link=facebook_link,
                       website_link=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description, genres=[genres])
         db.session.add(venue)
         db.session.commit()
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
         data = createVenueResponse(venue)
-        print(data)
     except:
         db.session.rollback()
         flash('An error occurred. Venue ' +
@@ -71,6 +70,13 @@ def create_venue_submission():
 #  Venues
 #  ----------------------------------------------------------------
 
+def getUpcomingShows(shows):
+    result = []
+    for show in shows:
+        if show.start_time > datetime.now(): 
+            result.append(show.start_time)
+    return result
+
 @venueRoute.route('/venues')
 def venues():
     try:
@@ -78,13 +84,11 @@ def venues():
         venues = db.session.query(Venue).options(lazyload(Venue.artists)).all()
         for venue in venues:
             key = venue.city+venue.state
-            print(venue.artists)
-            newVenue = {"id": venue.id, "name": venue.name}
-            # print(venue.shows)
+            numUpcomingShows = len(getUpcomingShows(venue.artists))
+            newVenue = {"id": venue.id, "name": venue.name, "num_upcoming_shows": numUpcomingShows }
             if key in venuesMap:
                 currentVenues = venuesMap[key]["venues"]
                 currentVenues.append(newVenue)
-                print(currentVenues)
                 venuesMap[key]["venues"] = currentVenues
             else:
                 venuesMap[key] = {
