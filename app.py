@@ -99,7 +99,7 @@ def create_venue_submission():
         seeking_description = form.seeking_description.data
         genres = form.genres.data
         venue = Venue(name=name, state=state, city=city, address=address, phone=phone, image_link=image_link, facebook_link=facebook_link,
-                      website_link=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description, genres=[genres])
+                      website_link=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description, genres=genres)
         db.session.add(venue)
         db.session.commit()
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
@@ -111,9 +111,6 @@ def create_venue_submission():
     finally:
         db.session.close()
     return render_template('pages/home.html')
-
-#  Venues
-#  ----------------------------------------------------------------
 
 def getUpcomingShows(shows):
     result = []
@@ -280,7 +277,7 @@ def create_artist_submission():
     seeking_description = form.seeking_description.data
     genres = form.genres.data
     artist = Artist(name=name, state=state, city=city, phone=phone, image_link=image_link, facebook_link=facebook_link,
-                  website_link=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description, genres=[genres])
+                  website_link=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description, genres=genres)
     db.session.add(artist)
     db.session.commit()
     flash('Artist ' + request.form['name'] + ' was successfully added!')
