@@ -197,7 +197,6 @@ def show_venue(venue_id):
 def delete_venue(venue_id):
     try:
         venue = Venue.query.get(venue_id)
-        venue_name = venue.name
         db.session.delete(venue)
         db.session.commit()
     except:
@@ -272,27 +271,23 @@ def createArtistsResponse(artist):
 @ app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   try:
-    form = request.form
-    name = form['name']
-    city = form['city']
-    state = form['state']
-    phone = form['phone']
-    image_link = form['image_link']
-    facebook_link = form['facebook_link']
-    website_link = form['website_link']
-    seeking_venue = True if form.get(
-        'seeking_venue', False) == 'y' else False
-    seeking_description = form['seeking_description']
-    genres = form['genres']
+    form = ArtistForm()
+    name = form.name.data
+    city = form.city.data
+    state = form.state.data
+    phone = form.phone.data
+    image_link = form.image_link.data
+    facebook_link = form.facebook_link.data
+    website_link = form.website_link.data
+    seeking_venue = form.seeking_venue.data
+    seeking_description = form.seeking_description.data
+    genres = form.genres.data
     artist = Artist(name=name, state=state, city=city, phone=phone, image_link=image_link, facebook_link=facebook_link,
                   website_link=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description, genres=[genres])
     db.session.add(artist)
     db.session.commit()
     flash('Artist ' + request.form['name'] + ' was successfully added!')
-    data = createArtistsResponse(artist)
-    print(data)
   except:
-    print("we enter here")
     db.session.rollback()
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   finally:
