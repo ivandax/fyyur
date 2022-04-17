@@ -162,8 +162,27 @@ def show_venue(venue_id):
     try:
         venue = db.session.query(Venue).get(venue_id)
         data = createVenueResponse(venue)
-        upcomingShows = db.session.query(Show).join(Venue).filter(Show.venue_id==venue_id).filter(Show.start_time>datetime.now()).all()
-        pastShows = db.session.query(Show).join(Venue).filter(Show.venue_id==venue_id).filter(Show.start_time<datetime.now()).all()
+        upcomingShowsQuery = db.session.query(Show).join(Venue).filter(Show.venue_id==venue_id).filter(Show.start_time>datetime.now()).all()
+        pastShowsQuery = db.session.query(Show).join(Venue).filter(Show.venue_id==venue_id).filter(Show.start_time<datetime.now()).all()
+        upcomingShows = []
+        pastShows = []
+        for show in upcomingShowsQuery:
+            dict = {
+                "artist_id": show.artist.id, 
+                "artist_name": show.artist.name, 
+                "artist_image_link": show.artist.image_link, 
+                "start_time": format_datetime(str(show.start_time))
+            }
+            print(dict)
+            upcomingShows.append(dict)
+        for show in pastShowsQuery:
+            dict = {
+                "artist_id": show.artist.id, 
+                "artist_name": show.artist.name, 
+                "artist_image_link": show.artist.image_link, 
+                "start_time": format_datetime(str(show.start_time))
+            }
+            pastShows.append(dict)
         data["upcoming_shows"] = upcomingShows
         data["past_shows"] = pastShows
         data["upcoming_shows_count"] = len(upcomingShows)
@@ -309,8 +328,26 @@ def show_artist(artist_id):
     try:
         artist = db.session.query(Artist).get(artist_id)
         data = createArtistsResponse(artist)
-        upcomingShows = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>datetime.now()).all()
-        pastShows = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time<datetime.now()).all()
+        upcomingShowsQuery = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>datetime.now()).all()
+        pastShowsQuery = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time<datetime.now()).all()
+        upcomingShows = []
+        pastShows = []
+        for show in upcomingShowsQuery:
+            dict = {
+                "venue_id": show.artist.id, 
+                "venue_name": show.artist.name, 
+                "venue_image_link": show.artist.image_link, 
+                "start_time": format_datetime(str(show.start_time))
+            }
+            upcomingShows.append(dict)
+        for show in pastShowsQuery:
+            dict = {
+                "venue_id": show.artist.id, 
+                "venue_name": show.artist.name, 
+                "venue_image_link": show.artist.image_link, 
+                "start_time": format_datetime(str(show.start_time))
+            }
+            pastShows.append(dict)
         data["upcoming_shows"] = upcomingShows
         data["past_shows"] = pastShows
         data["upcoming_shows_count"] = len(upcomingShows)
