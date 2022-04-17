@@ -300,17 +300,15 @@ def create_artist_submission():
 
 @ app.route('/artists')
 def artists():
-    # TODO: replace with real data returned from querying the database
-    data = [{
-        "id": 4,
-        "name": "Guns N Petals",
-    }, {
-        "id": 5,
-        "name": "Matt Quevedo",
-    }, {
-        "id": 6,
-        "name": "The Wild Sax Band",
-    }]
+    try:
+        data = []
+        artists = db.session.query(Artist).all()
+        for artist in artists:
+            result = {"id": artist.id, "name": artist.name}
+            data.append(result)
+        print(data)  
+    except:
+        print(sys.exc_info)
     return render_template('pages/artists.html', artists=data)
 
 
